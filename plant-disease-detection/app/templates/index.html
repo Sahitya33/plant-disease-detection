@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="upload-card">
+  <h2>Upload a leaf image</h2>
+  <form action="{{ url_for('main.predict') }}" method="post" enctype="multipart/form-data">
+    <input type="file" name="image" accept=".png,.jpg,.jpeg" required>
+    <button type="submit">Diagnose</button>
+  </form>
+</section>
+
+{% if result %}
+<section class="result-card">
+  <h2>Result</h2>
+  <img src="{{ url_for('static', filename='uploads/' ~ result.filename) }}" alt="uploaded leaf" class="preview">
+  <p><strong>{{ result.predicted_class }}</strong></p>
+  <p>Confidence: {{ "%.1f"|format(result.confidence * 100) }}%</p>
+</section>
+{% endif %}
+
+<section class="history-card">
+  <h2>Recent predictions</h2>
+  {% if recent %}
+  <table>
+    <thead>
+      <tr><th>Image</th><th>Prediction</th><th>Confidence</th><th>When</th></tr>
+    </thead>
+    <tbody>
+      {% for p in recent %}
+      <tr>
+        <td><img src="{{ url_for('static', filename='uploads/' ~ p.filename) }}" class="thumb" alt=""></td>
+        <td>{{ p.predicted_class }}</td>
+        <td>{{ "%.1f"|format(p.confidence * 100) }}%</td>
+        <td>{{ p.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No predictions yet — upload an image above to get started.</p>
+  {% endif %}
+</section>
+
+{% endblock %}
